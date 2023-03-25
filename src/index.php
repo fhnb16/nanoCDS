@@ -5,7 +5,7 @@ Author: Artur `fhnb16` Tkachenko
 */
 
 // Create folder with name `__hidden` to hide files from Nano CDS
-$Version = 1.4;
+$Version = 1.5;
 
 $time = microtime();
 $time = explode(' ', $time);
@@ -153,6 +153,9 @@ $attachment_location = $_GET["dir"].DIRECTORY_SEPARATOR.$_GET["name"];
                 break;
                 case "js":
                     header('Content-Type: application/javascript');
+                break;
+                case "ttf":
+                    header('Content-Type: application/x-font-ttf');
                 break;
                 case "php":
 
