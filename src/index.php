@@ -1,7 +1,7 @@
 <?
 /*
 Author: Artur `fhnb16` Tkachenko
-2020
+2020-2024
 */
 
 // Create folder with name `__hidden` to hide files from Nano CDS
@@ -76,10 +76,10 @@ about:
                 in work.</p>
                 <p>All rights of the frameworks presented in Nano CDS belong to their owners.</p>
                 <p>If you want to support me, please visit <a href="//fhnb.ru/photos/?page=support" class="btnv1" style="color:white;">this page</a></p>
-                <p>Write me to buy Nano CDS - <a class="btnv1" style="color:white;" href="mailto:artur@fhnb.ru">artur@fhnb.ru</a></p>
+                <p>Write me - <a class="btnv1" style="color:white;" href="mailto:artur@fhnb.ru">artur@fhnb.ru</a></p>
                 <p>Made by <a href="//fhnb.ru" class="btnv1" style="color:white;">fhnb16</a> in 2020</p>
                 <p>Nano CDS size is <?echo formatBytes(filesize('index.php')+filesize('footer.php')+filesize('header.php'),1);?> (3 files)</p>
-                <p>Version: <?echo sprintf("%.1f", $Version);?></p>
+                <p>Version: <?echo $Version;?></p>
 </div>
 <?
             include_once('footer.php');
@@ -292,6 +292,7 @@ $count3 = count(getDirContents(__DIR__));
 <select name="auto" class="form-control">
       <option value="1">OPEN</option>
       <option selected value="0">VIEW</option>
+      <option value="-1">LINK</option>
     </select>
   </div>
   <div class="form-group">
@@ -369,15 +370,9 @@ $count3 = count(getDirContents(__DIR__));
         }
         latest:
         if($_GET["page"] == "latest"){
-
+            ob_start();
             $_GET["asset"] = str_replace("__hidden", "", $_GET["asset"]);
             
-            $AutoOpen = false;
-            if($_GET["auto"] == 0 || !isset($_GET["auto"]) || empty($_GET["auto"])){
-                $AutoOpen = false;
-            }else{
-                $AutoOpen = true;
-            }
 
             $PageTitle = "Search: ".$_GET["asset"]; include_once('header.php');
 
@@ -444,10 +439,19 @@ switch($_GET["size"]){
                 break;
                         } 
                         if (is_file($file) && !strpos(basename($file), ".php") && !strpos(basename($file), ".htm") && !strpos(basename($file), ".html")) {
-                            if($AutoOpen){
-                                echo '<script>window.location="'.basename(__FILE__).'?page=view&dir='.str_replace(basename($file), "", str_replace(__DIR__, "", $file)).'&name='.basename($file).'"</script>';
-                                
-                            exit;
+                            if($_GET["auto"] == -1){
+                                $fullUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://" . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+                                $fullUrl = str_replace("auto=-1", "auto=1", $fullUrl);
+                                echo '<center><a id="latestLink" href="'.$fullUrl.'">'.$fullUrl.'</a></center>';
+                                exit();
+                            }
+                            if($_GET["auto"] == 1){
+                                $tempDirReg = getDirectoryPath($file);
+                                $tempLink = basename(__FILE__).'?page=view&dir='.$tempDirReg.'&name='.basename($file);
+                                //echo '<script>window.location="'.$tempLink.'"</script>';
+                                ob_end_clean();
+                                header("Location: ".$tempLink."", true, 301);
+                                exit();
                             }
             ?>
             <a href="?page=view&dir=<?echo str_replace(basename($file), "", str_replace(__DIR__, "", $file));?>&name=<?echo basename($file);?>" class="group-item group-item-action"><span class="uppertext"><?echo basename($file);?></span> <span style="float:right;">[ <?echo str_replace(basename($file), "", str_replace(__DIR__, "", $file));?> ]</span></a>
@@ -518,5 +522,16 @@ function glob_tree_search($path, $pattern, $_base_path = null)
 	return $out;
 }
 
+function getDirectoryPath($file) {
+    // Разбиваем путь по разделителю директорий
+    $parts = explode('/', $file);
+
+    // Находим последний элемент массива (имя файла) и удаляем его
+    array_pop($parts);
+
+    // Объединяем оставшиеся части пути обратно
+    return implode('/', $parts);
+  }
+
  
-?>
+?> ?>
