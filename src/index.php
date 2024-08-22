@@ -270,6 +270,8 @@ $count3 = count(getDirContents(__DIR__));
       <option value="any">ANY</option>
       <option value="css">CSS</option>
       <option value="js">JS</option>
+      <option value="json">JSON</option>
+      <option value="xml">XML</option>
       <option value="svg">SVG</option>
       <option value="png">PNG</option>
       <option value="gif">GIF</option>
@@ -279,6 +281,8 @@ $count3 = count(getDirContents(__DIR__));
       <option value="rar">RAR</option>
       <option value="7z">7Z</option>
       <option value="exe">EXE</option>
+      <option value="txt">TXT</option>
+      <option value="html">HTML</option>
     </select>
   </div>
   <div class="form-group">
@@ -381,6 +385,8 @@ switch($_GET["type"]){
     case "any": $fileType = ".*";   break;
     case "css": $fileType = ".css"; break;
     case "js":  $fileType = ".js";  break;
+    case "json":  $fileType = ".json";  break;
+    case "xml":  $fileType = ".xml";  break;
     case "svg": $fileType = ".svg"; break;
     case "png": $fileType = ".png"; break;
     case "gif": $fileType = ".gif"; break;
@@ -390,6 +396,8 @@ switch($_GET["type"]){
     case "rar": $fileType = ".rar"; break;
     case "7z": $fileType = ".7z"; break;
     case "exe": $fileType = ".exe"; break;
+    case "txt": $fileType = ".txt"; break;
+    case "html": $fileType = ".htm?"; break;
     default:    $fileType = ".*";   break;
 }
 $MinOrMax = "*";
