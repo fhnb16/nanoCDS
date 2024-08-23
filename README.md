@@ -6,4 +6,5 @@ Lightweight PHP tool for libraries and assets local hosting.
 
 ![Preview image](/preview.jpg)
 ---
-Place folders with content in same location with `.php` files
+Place folders with content in same location with `NanoCDS` folder and `.htaccess` file
+Name folder `__hidden` to hide from NanoCDS
