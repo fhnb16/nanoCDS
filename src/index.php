@@ -5,12 +5,15 @@ Author: Artur `fhnb16` Tkachenko
 */
 
 // Create folder with name `__hidden` to hide files from Nano CDS
-$Version = 1.5;
+$Version = 1.51;
+//$rootDir = ""; // root directory, `/assets` or `/` or anything else..
 
 $time = microtime();
 $time = explode(' ', $time);
 $time = $time[1] + $time[0];
 $start = $time;
+
+include_once 'url_parser.php';
 
 function formatBytes($bytes, $precision = 2) {
     $unit = ["B", "KB", "MB", "GB"];
@@ -24,7 +27,7 @@ if(empty($_GET) && !isset($_GET["lib"]) && !isset($_GET["page"])){
 ?>
 <div class="group">
     <span class="group-item group-item-action header">
-        <a class="color-gray" href="<?echo basename(__FILE__);?>">Nano CDS</a><span style="float:right;"><a href="?page=about" class="btnv1">What is it? -></a></span>
+        <a class="color-gray" href="<?echo $rootDir ?? "/assets/" ?>">Nano CDS</a><span style="float:right;"><a href="?page=about" class="btnv1">What is it? -></a></span>
     </span>
     <?
         $dir = new DirectoryIterator(__DIR__);
@@ -71,7 +74,7 @@ about:
             ?>
 <div class="group">
     <span class="group-item group-item-action header">
-        <a class="color-gray" href="<?echo basename(__FILE__);?>">Nano CDS</a> &middot; <span class="uppertext">About</span><a href="javascript:history.back()" class="btnv1" style="float:right;">
+        <a class="color-gray" href="<?echo $rootDir ?? "/assets/" ?>">Nano CDS</a> &middot; <span class="uppertext">About</span><a href="javascript:history.back()" class="btnv1" style="float:right;">
             <- Go Back</a> </span> <p>CDS means Content Delivery System (Repository), this system was developed by <a href="//fhnb.ru" class="btnv1 me" style="color:white;">fhnb16</a> to simplify the delivery and storage of various CSS frameworks and JS libraries, software or other files which are necessary
                 in work.</p>
                 <p>All rights of the frameworks presented in Nano CDS belong to their owners.</p>
@@ -92,7 +95,7 @@ about:
             ?>
 <div class="group">
     <span class="group-item group-item-action header">
-        <a class="color-gray" href="<?echo basename(__FILE__);?>">Nano CDS</a> &middot;
+        <a class="color-gray" href="<?echo $rootDir ?? "/assets/" ?>">Nano CDS</a> &middot;
         <span class="uppertext"><?echo str_replace(DIRECTORY_SEPARATOR , " &bull; ", $_GET["name"]);?></span><a href="javascript:history.back()" class="btnv1" style="float:right;">
             <- Go Back</a> </span> <? 
 
@@ -109,7 +112,7 @@ about:
                                {
                                 if(is_file($_GET["name"].DIRECTORY_SEPARATOR .$value)){
                                     ?>
-        <a href="?page=view&dir=<?echo $_GET["name"];?>&name=<?echo $value;?>" class="group-item group-item-action"><?echo $value;?><span style="float:right;"><?echo formatBytes(exec('du -bcS ' . $_GET["name"].DIRECTORY_SEPARATOR .$value))?></span></a>
+        <a href="<? echo ($rootDir ?? "/assets/")."index.php" ?>?page=view&dir=<?echo $_GET["name"];?>&name=<?echo $value;?>" class="group-item group-item-action"><?echo $value;?><span style="float:right;"><?echo formatBytes(exec('du -bcS ' . $_GET["name"].DIRECTORY_SEPARATOR .$value))?></span></a>
                 <?
                                 }else if(is_dir($_GET["name"].DIRECTORY_SEPARATOR .$value)){
                                     ?>
@@ -163,7 +166,7 @@ $attachment_location = $_GET["dir"].DIRECTORY_SEPARATOR.$_GET["name"];
                     ?>
                     <div class="group">
             <span class="group-item group-item-action header">
-            <a class="color-gray" href="<?echo basename(__FILE__);?>">Nano CDS</a> &middot; <span class="uppertext">Messages</span><a href="javascript:history.back()" class="btnv1" style="float:right;"><- Go Back</a>
+            <a class="color-gray" href="<?echo $rootDir ?? "/assets/" ?>">Nano CDS</a> &middot; <span class="uppertext">Messages</span><a href="javascript:history.back()" class="btnv1" style="float:right;"><- Go Back</a>
         </span>
             <p><span class='color-warning'>Warning</span>: <span class='color-grey'>You can't view files with this extension</span>.</p>
         </div>
@@ -190,7 +193,7 @@ $attachment_location = $_GET["dir"].DIRECTORY_SEPARATOR.$_GET["name"];
             ?>
             <div class="group">
     <span class="group-item group-item-action header">
-    <a class="color-gray" href="<?echo basename(__FILE__);?>">Nano CDS</a> &middot; <span class="uppertext">Messages</span><a href="javascript:history.back()" class="btnv1" style="float:right;"><- Go Back</a>
+    <a class="color-gray" href="<?echo $rootDir ?? "/assets/" ?>">Nano CDS</a> &middot; <span class="uppertext">Messages</span><a href="javascript:history.back()" class="btnv1" style="float:right;"><- Go Back</a>
 </span>
     <p><span class='color-error'>Error</span>: <span class='color-grey'>File not found</span>.</p>
 </div>
@@ -207,7 +210,7 @@ $attachment_location = $_GET["dir"].DIRECTORY_SEPARATOR.$_GET["name"];
         
 <div class="group">
   <span class="group-item group-item-action header">
-  <a class="color-gray" href="<?echo basename(__FILE__);?>">Nano CDS</a> &middot; <span class="uppertext">Tools</span><a href="javascript:history.back()" class="btnv1" style="float:right;"><- Go Back</a>
+  <a class="color-gray" href="<?echo $rootDir ?? "/assets/" ?>">Nano CDS</a> &middot; <span class="uppertext">Tools</span><a href="javascript:history.back()" class="btnv1" style="float:right;"><- Go Back</a>
   </span>
   <?
   $count1 = 0;
@@ -329,7 +332,7 @@ $count3 = count(getDirContents(__DIR__));
         ?>
         <div class="group">
             <span class="group-item group-item-action header">
-            <a class="color-gray" href="<?echo basename(__FILE__);?>">Nano CDS</a> &middot; <span id="searchCount" class="uppertext">Search: `<?echo $_GET["query"];?>`</span><a href="javascript:history.back()" class="btnv1" style="float:right;"><- Go Back</a>
+            <a class="color-gray" href="<?echo $rootDir ?? "/assets/" ?>">Nano CDS</a> &middot; <span id="searchCount" class="uppertext">Search: `<?echo $_GET["query"];?>`</span><a href="javascript:history.back()" class="btnv1" style="float:right;"><- Go Back</a>
             </span>
             <?
                 //$dir = glob($_GET["query"].'.*');
@@ -359,7 +362,7 @@ $count3 = count(getDirContents(__DIR__));
                         
                             //echo $file."<br/>";
             ?>
-            <a href="?page=view&dir=<?echo str_replace(basename($file), "", str_replace(__DIR__, "", $file));?>&name=<?echo basename($file);?>" class="group-item group-item-action"><span class="uppertext"><?echo basename($file);?></span> <span style="float:right;">[ <?echo str_replace(basename($file), "", str_replace(__DIR__, "", $file));?> ]</span></a>
+            <a href="<? echo ($rootDir ?? "/assets/")."index.php" ?>?page=view&dir=<?echo str_replace(basename($file), "", str_replace(__DIR__, "", $file));?>&name=<?echo basename($file);?>" class="group-item group-item-action"><span class="uppertext"><?echo basename($file);?></span> <span style="float:right;">[ <?echo str_replace(basename($file), "", str_replace(__DIR__, "", $file));?> ]</span></a>
             <?
                                     /* title="<?echo formatBytes(exec('du -bcS ' . str_replace(basename($file), "", str_replace(__DIR__, "", $file)).DIRECTORY_SEPARATOR .basename($file)))?>"*/
                     }
@@ -412,7 +415,7 @@ switch($_GET["size"]){
         ?>
         <div class="group">
             <span class="group-item group-item-action header">
-            <a class="color-gray" href="<?echo basename(__FILE__);?>">Nano CDS</a> &middot; <span id="searchCount" class="uppertext">Search: `<?echo $_GET["asset"];?>`</span><a href="javascript:history.back()" class="btnv1" style="float:right;"><- Go Back</a>
+            <a class="color-gray" href="<?echo $rootDir ?? "/assets/" ?>">Nano CDS</a> &middot; <span id="searchCount" class="uppertext">Search: `<?echo $_GET["asset"];?>`</span><a href="javascript:history.back()" class="btnv1" style="float:right;"><- Go Back</a>
             </span>
             <?
                 //$dir = glob($_GET["asset"].'.*');
@@ -450,19 +453,23 @@ switch($_GET["size"]){
                             if($_GET["auto"] == -1){
                                 $fullUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://" . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
                                 $fullUrl = str_replace("auto=-1", "auto=1", $fullUrl);
+                                $fullUrl = str_replace("/a/-1", "/a/1", $fullUrl);
                                 echo '<center><a id="latestLink" href="'.$fullUrl.'">'.$fullUrl.'</a></center>';
+                                include_once('footer.php');
                                 exit();
                             }
                             if($_GET["auto"] == 1){
                                 $tempDirReg = getDirectoryPath($file);
-                                $tempLink = basename(__FILE__).'?page=view&dir='.$tempDirReg.'&name='.basename($file);
+                                $tempLink = ($rootDir ?? "/assets/")."index.php".'?page=view&dir='.$tempDirReg.'&name='.basename($file);
+                                //$tempLink = clean_url($tempLink);
                                 //echo '<script>window.location="'.$tempLink.'"</script>';
+                                //echo $tempLink;
                                 ob_end_clean();
                                 header("Location: ".$tempLink."", true, 301);
                                 exit();
                             }
             ?>
-            <a href="?page=view&dir=<?echo str_replace(basename($file), "", str_replace(__DIR__, "", $file));?>&name=<?echo basename($file);?>" class="group-item group-item-action"><span class="uppertext"><?echo basename($file);?></span> <span style="float:right;">[ <?echo str_replace(basename($file), "", str_replace(__DIR__, "", $file));?> ]</span></a>
+            <a href="<? echo ($rootDir ?? "/assets/")."index.php" ?>?page=view&dir=<?echo str_replace(basename($file), "", str_replace(__DIR__, "", $file));?>&name=<?echo basename($file);?>" class="group-item group-item-action"><span class="uppertext"><?echo basename($file);?></span> <span style="float:right;">[ <?echo str_replace(basename($file), "", str_replace(__DIR__, "", $file));?> ]</span></a>
             <?
                         /* title="<?echo formatBytes(exec('du -bcS ' . str_replace(basename($file), "", str_replace(__DIR__, "", $file)).DIRECTORY_SEPARATOR .basename($file)))?>"*/
                     }
@@ -531,15 +538,18 @@ function glob_tree_search($path, $pattern, $_base_path = null)
 }
 
 function getDirectoryPath($file) {
-    // Разбиваем путь по разделителю директорий
     $parts = explode('/', $file);
 
-    // Находим последний элемент массива (имя файла) и удаляем его
     array_pop($parts);
 
-    // Объединяем оставшиеся части пути обратно
     return implode('/', $parts);
   }
 
+  function clean_url($url) {
+    $pattern = '#(/assets/).*?(/index\.php)#';
+    $replacement = '$1$2';
+    
+    return preg_replace($pattern, $replacement, $url);
+}
  
 ?> ?>

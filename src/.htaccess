@@ -1,0 +1,36 @@
+RewriteEngine On
+
+Header add Access-Control-Allow-Origin "*"
+Header add Access-Control-Allow-Headers "origin, x-requested-with, content-type"
+Header add Access-Control-Allow-Methods "PUT, GET, POST, DELETE, OPTIONS"
+
+<IfModule mod_expires.c>
+ExpiresActive On
+AddType application/vnd.ms-fontobject .eot 
+AddType application/x-font-ttf .ttf
+AddType application/x-font-opentype .otf
+AddType application/x-font-woff .woff
+AddType image/svg+xml .svg
+ExpiresByType application/vnd.ms-fontobject "access 1 year"
+ExpiresByType application/x-font-ttf "access 1 year"
+ExpiresByType application/x-font-opentype "access 1 year"
+ExpiresByType application/x-font-woff "access 1 year"
+ExpiresByType image/svg+xml "access 1 year"
+ExpiresByType text/html "access 1 hour"
+ExpiresByType text/css "access 14 days"
+ExpiresByType text/x-javascript "access 3 weeks"
+ExpiresByType application/javascript "access 1 month"  
+ExpiresByType application/x-javascript "access 1 month"
+ExpiresDefault "access 2 days"
+</IfModule>
+
+# Убедимся, что запросы к реальным файлам и директориям не перенаправляются
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# Исключаем запросы, которые содержат "index.php" в URL, чтобы предотвратить циклические перенаправления
+RewriteCond %{REQUEST_URI} !/index\.php$
+
+# Перенаправляем только запросы без параметров на index.php
+RewriteRule ^(.*)$ index.php [L,QSA]
+
