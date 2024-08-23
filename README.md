@@ -1,5 +1,5 @@
 # nanoCDS
-## Small Content Delivery System v1.6
+## Small Content Delivery System v1.7
 Lightweight PHP tool for libraries and assets local hosting.
 
 > [Test live on my website](https://dev.fhnb.ru/assets/)

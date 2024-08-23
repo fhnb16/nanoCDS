@@ -5,8 +5,10 @@ Author: Artur `fhnb16` Tkachenko
 */
 
 // Create folder with name `__hidden` to hide files from Nano CDS
-$Version = 1.6;
-//$rootDir = ""; // root directory, `/assets` or `/` or anything else..
+$Version = 1.7;
+//$rootDir = ""; // root directory, `/assets/` or `/` or anything else..
+
+define('ROOT', __DIR__ . '/../');
 
 $time = microtime();
 $time = explode(' ', $time);
@@ -30,9 +32,9 @@ if(empty($_GET) && !isset($_GET["lib"]) && !isset($_GET["page"])){
         <a class="color-gray" href="<?echo $rootDir ?? "/assets/" ?>">Nano CDS</a><span style="float:right;"><a href="?page=about" class="btnv1">What is it? -></a></span>
     </span>
     <?
-        $dir = new DirectoryIterator(__DIR__);
+        $dir = new DirectoryIterator(ROOT);
         foreach ($dir as $fileinfo) {
-            if ($fileinfo->isDir() && !$fileinfo->isDot() && $fileinfo->getFilename() != "__hidden") {
+            if ($fileinfo->isDir() && !$fileinfo->isDot() && $fileinfo->getFilename() != "__hidden" && $fileinfo->getFilename() != "NanoCDS") {
                 
     ?>
     <a href="?page=dir&name=<?echo $fileinfo->getFilename();?>" class="group-item group-item-action"><span class="uppertext">
@@ -82,7 +84,7 @@ about:
                 <p>Write me - <a class="btnv1" style="color:white;" href="mailto:artur@fhnb.ru">artur@fhnb.ru</a></p>
                 <p>Made by <a href="//fhnb.ru" class="btnv1" style="color:white;">fhnb16</a> in 2020</p>
                 <p>Source code on <a href="//github.com/fhnb16/nanoCDS" class="btnv1" style="color:white;">Github</a></p>
-                <p>Nano CDS size is <?echo formatBytes(filesize('index.php')+filesize('footer.php')+filesize('header.php'),1);?> (3 files)</p>
+                <p>Nano CDS size is <?echo formatBytes(filesize('index.php')+filesize('footer.php')+filesize('header.php')+filesize('url_parser.php'),1);?> (4 files)</p>
                 <p>Version: <?echo $Version;?>, <? echo date("F d Y H:i:s", filemtime(__FILE__))?></p>
 </div>
 <?
@@ -103,21 +105,21 @@ about:
 
                             $result = array();
 
-    if(file_exists($_GET["name"])){
-                            $cdir = scandir(str_replace("..", "", str_replace("__hidden", "", $_GET["name"])),1);
+    if(file_exists("../".$_GET["name"])){
+                            $cdir = scandir("../".str_replace("..", "", str_replace("NanoCDS", "", str_replace("__hidden", "", $_GET["name"]))),1);
                             foreach ($cdir as $key => $value)
                             {
                                 
     if(strpos($value, '.php') || strpos($value, '.htm')) continue;
                                if (!in_array($value,array(".","..", "__hidden")))
                                {
-                                if(is_file($_GET["name"].DIRECTORY_SEPARATOR .$value)){
+                                if(is_file("../".$_GET["name"].DIRECTORY_SEPARATOR .$value)){
                                     ?>
-        <a href="<? echo ($rootDir ?? "/assets/")."index.php" ?>?page=view&dir=<?echo $_GET["name"];?>&name=<?echo $value;?>" class="group-item group-item-action"><?echo $value;?><span style="float:right;"><?echo formatBytes(exec('du -bcS ' . $_GET["name"].DIRECTORY_SEPARATOR .$value))?><div class="downloadIcon"></div></span></a>
+        <a href="<? echo ($rootDir ?? "/assets/") ?>?page=view&dir=<?echo $_GET["name"];?>&name=<?echo $value;?>" class="group-item group-item-action"><?echo $value;?><span style="float:right;"><?echo formatBytes(exec('du -bcS ' . "../".$_GET["name"].DIRECTORY_SEPARATOR .$value))?><div class="downloadIcon"></div></span></a>
                 <?
-                                }else if(is_dir($_GET["name"].DIRECTORY_SEPARATOR .$value)){
+                                }else if(is_dir("../".$_GET["name"].DIRECTORY_SEPARATOR .$value)){
                                     ?>
-        <a href="?page=dir&name=<?echo $_GET["name"].DIRECTORY_SEPARATOR .$value;?>" class="group-item group-item-action"><span class="uppertext"><?echo $value;?></span><span style="float:right;"><?echo formatBytes(exec('du -bcS ' . $_GET["name"].DIRECTORY_SEPARATOR .$value))?><div class="downloadIcon"></div></span></a>
+        <a href="?page=dir&name=<?echo $_GET["name"].DIRECTORY_SEPARATOR .$value;?>" class="group-item group-item-action"><span class="uppertext"><?echo $value;?></span><span style="float:right;"><?echo formatBytes(exec('du -bcS ' . "../".$_GET["name"].DIRECTORY_SEPARATOR .$value))?><div class="downloadIcon"></div></span></a>
                 <?
                                 }
                                }
@@ -146,7 +148,7 @@ about:
         view:
         if($_GET["page"] == "view"){
 
-$attachment_location = $_GET["dir"].DIRECTORY_SEPARATOR.$_GET["name"];
+$attachment_location = "../".$_GET["dir"].DIRECTORY_SEPARATOR.$_GET["name"];
         if (file_exists($attachment_location)) {
 
             header($_SERVER["SERVER_PROTOCOL"] . " 200 OK");
@@ -215,51 +217,19 @@ $attachment_location = $_GET["dir"].DIRECTORY_SEPARATOR.$_GET["name"];
   </span>
   <?
   $count1 = 0;
-  $count2 = 0;
-  $count3 = 0;
-  foreach (new DirectoryIterator(__DIR__) as $fileInfo) {
+  foreach (new DirectoryIterator(realpath(ROOT)) as $fileInfo) {
     if(strpos($fileInfo, "__hidden") !== false) continue;
+    if(strpos($fileInfo, "NanoCDS") !== false) continue;
     if($fileInfo->isDir() && !$fileInfo->isDot()){
         $count1++;
     }
   }
-
-  if( $handle = opendir(__DIR__) ) { 
-      
-    while( ($file = readdir($handle)) !== false ) { 
-        if( !in_array($file, array('.', '..', '__hidden')) && !is_dir($file))  
-            $count2++; 
-    } 
-} 
-$dir_iterator = new RecursiveDirectoryIterator(__DIR__);
-$iterator = new RecursiveIteratorIterator($dir_iterator, RecursiveIteratorIterator::SELF_FIRST);
-// could use CHILD_FIRST if you so wish
-foreach ($iterator as $file) {
-    if(is_dir($file) && !is_file($file)) continue;
-    if(strpos($file, '.php') || strpos($file, '.htm') || strpos($file, '..') || strpos($file, '/.') || strpos($file, "__hidden") !== false) continue;
-    //echo $file."<br/>";
-    $count2++;
-}
-
-function getDirContents($path) {
-    $rii = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($path));
-    $files = array(); 
-    foreach ($rii as $file)
-    //if(strpos($file, '__hidden') || strpos($file, '..')) continue;
-    
-        if ($file->isDir()){
-            if(strpos($file, "__hidden") !== false || strpos($file, "..") !== false) continue;
-            $files[] = $file; //->getPathname()
-        }
-            //var_dump($files);
-    return $files;
-}
-$count3 = count(getDirContents(__DIR__));
+  $counter = countFilesAndDirs(realpath(ROOT));
   ?>
-  <p>Projects in repository: <?echo $count1;?> and size is <?echo formatBytes(exec('du -bcS ' . __DIR__))?>.</p>
-  <p>Total Files in repository: <?echo $count2;?> in <?echo $count3;?> folders.</p>
+  <p>Projects in repository: <?echo $count1;?> and size is <?echo formatBytes(exec('du -bcS ' . ROOT))?>.</p>
+  <p>Total Files in repository: <?echo $counter['files'];?> in <?echo $counter['dirs'];?> folders.</p>
   <p>Fild latest library or framework version:</p>
-<form action="<?echo basename(__FILE__);?>" method="GET" class="form-inline">
+<form action="<?echo $rootDir ?? "/assets/" ?>" method="GET" class="form-inline">
 <input type="hidden" name="page" value="latest" />
   <div class="form-group">
     <input type="text" class="form-control" name="asset" placeholder="Asset Name" required>
@@ -308,7 +278,7 @@ $count3 = count(getDirContents(__DIR__));
 </div>
 </form>
 <p>Search by File Name:</p>
-<form action="<?echo basename(__FILE__);?>" method="GET" class="form-inline">
+<form action="<?echo $rootDir ?? "/assets/" ?>" method="GET" class="form-inline">
 <input type="hidden" name="page" value="search" />
   <div class="form-group">
     <input type="text" class="form-control" placeholder="File Name" name="query" required>
@@ -328,6 +298,7 @@ $count3 = count(getDirContents(__DIR__));
         if($_GET["page"] == "search"){
 
             $_GET["query"] = str_replace("__hidden", "", $_GET["query"]);
+            $_GET["query"] = str_replace("NanoCDS", "", $_GET["query"]);
 
             $PageTitle = "Search: ".$_GET["query"]; include_once('header.php');
         ?>
@@ -338,10 +309,10 @@ $count3 = count(getDirContents(__DIR__));
             <?
                 //$dir = glob($_GET["query"].'.*');
  
-                //$path = __DIR__ . '/tmp';
-                $files = glob_tree_search(__DIR__, $_GET["query"].'.*');
+                //$path = ROOT . '/tmp';
+                $files = glob_tree_search(realpath(ROOT), $_GET["query"].'.*');
                 //print_r($files);
-                //$files = glob(__DIR__ . '/*'.$_GET["query"].'*.*');
+                //$files = glob(ROOT . '/*'.$_GET["query"].'*.*');
                 //var_dump($files);
 
                 $SearchCount = " (Files: ".count($files).")";
@@ -352,20 +323,19 @@ $count3 = count(getDirContents(__DIR__));
                 } 
                 foreach($files as $file) { 
                     
-    if(strpos($file, '.php') || strpos($file, '.htm') || strpos($file, "__hidden") !== false) continue;
                         if($_GET["query"] == ""){
                             ?>
                     <p><span class='color-info'>Info</span>: <span class='color-grey'>Search Query is empty</span>!</p>
                 <?   
                 break;
                         } 
-                        if (is_file($file) && !strpos(basename($file), ".php") && strpos($file, "__hidden") !== true && !strpos(basename($file), ".htm") && !strpos(basename($file), ".html")) {
+                        if (is_file("../".$file) && !strpos(basename("../".$file), ".php") && strpos("../".$file, "NanoCDS") !== true && strpos("../".$file, "__hidden") !== true && !strpos(basename("../".$file), ".htm") && !strpos(basename("../".$file), ".html")) {
                         
                             //echo $file."<br/>";
             ?>
-            <a href="<? echo ($rootDir ?? "/assets/")."index.php" ?>?page=view&dir=<?echo removeLastOccurrence(str_replace(__DIR__, "", $file), basename($file));?>&name=<?echo basename($file);?>" class="group-item group-item-action"><span class="uppertext"><?echo basename($file);?></span> <span style="float:right;">[ <?echo removeLastOccurrence(str_replace(__DIR__, "", $file), basename($file));?> ] <div class="downloadIcon"></div></span></a>
+            <a href="<? echo ($rootDir ?? "/assets/") ?>?page=view&dir=<?echo removeLastOccurrence(str_replace(ROOT, "", $file), basename($file));?>&name=<?echo basename($file);?>" class="group-item group-item-action"><span class="uppertext"><?echo basename($file);?></span> <span style="float:right;">[ <?echo removeLastOccurrence(str_replace(ROOT, "", $file), basename($file));?> ] <div class="downloadIcon"></div></span></a>
             <?
-                                    /* title="<?echo formatBytes(exec('du -bcS ' . str_replace(basename($file), "", str_replace(__DIR__, "", $file)).DIRECTORY_SEPARATOR .basename($file)))?>"*/
+                                    /* title="<?echo formatBytes(exec('du -bcS ' . str_replace(basename($file), "", str_replace(ROOT, "", $file)).DIRECTORY_SEPARATOR .basename($file)))?>"*/
                     }
         }
             ?>
@@ -421,10 +391,10 @@ switch($_GET["size"]){
             <?
                 //$dir = glob($_GET["asset"].'.*');
  
-                //$path = __DIR__ . '/tmp';
-                $files = glob_tree_search(__DIR__, $_GET["asset"].$MinOrMax.$fileType);
+                //$path = ROOT . '/tmp';  realpath(ROOT)"../".
+                $files = glob_tree_search(realpath(ROOT), $_GET["asset"].$MinOrMax.$fileType);
                 //print_r($files);
-                //$files = glob(__DIR__ . '/*'.$_GET["asset"].'*.*');
+                //$files = glob(ROOT . '/*'.$_GET["asset"].'*.*');
                 //var_dump($files);
                 $SearchCount = " (Files: ".count($files).")";
                 if(count($files) < 1){
@@ -433,9 +403,6 @@ switch($_GET["size"]){
         <?   
                 } 
                 foreach(array_reverse($files) as $file) { // array_reverse($files)
-                    
-                    //echo $file."<br/>";
-                    if(strpos($file, '.php') || strpos($file, '.htm') || strpos($file, "__hidden") !== false) continue;
 
                     if($_GET["size"] == "2"){
                         if(strpos(basename($file), '.min')){
@@ -443,25 +410,21 @@ switch($_GET["size"]){
                         }
                     }
 
-
-                        if($_GET["asset"] == ""){
-                            ?>
-                    <p><span class='color-info'>Info</span>: <span class='color-grey'>Search Query is empty</span>!</p>
-                <?   
-                break;
-                        } 
-                        if (is_file($file) && !strpos(basename($file), ".php") && !strpos(basename($file), ".htm") && !strpos(basename($file), ".html")) {
+                    if($_GET["asset"] == ""){ ?>
+                        <p><span class='color-info'>Info</span>: <span class='color-grey'>Search Query is empty</span>!</p>
+                    <? break; } 
+                        if (is_file("../".$file) && !strpos(basename($file), ".php") && !strpos(basename($file), ".htm") && !strpos(basename($file), ".html")) {
                             if($_GET["auto"] == -1){
                                 $fullUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://" . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
                                 $fullUrl = str_replace("auto=-1", "auto=1", $fullUrl);
                                 $fullUrl = str_replace("/a/-1", "/a/1", $fullUrl);
-                                echo '<a class="link btn btn-default" id="latestLink" href="'.$fullUrl.'">'.$fullUrl.'</a>';
+                                echo '<a class="group-item group-item-action" id="latestLink" href="'.$fullUrl.'"><div class="middleText">'.$fullUrl.'</div> <div style="float:right;" class="downloadIcon"></div></a>';
                                 include_once('footer.php');
                                 exit();
                             }
                             if($_GET["auto"] == 1){
                                 $tempDirReg = getDirectoryPath($file);
-                                $tempLink = ($rootDir ?? "/assets/")."index.php".'?page=view&dir='.$tempDirReg.'&name='.basename($file);
+                                $tempLink = ($rootDir ?? "/assets/").'?page=view&dir='.$tempDirReg.'&name='.basename($file);
                                 //$tempLink = clean_url($tempLink);
                                 //echo '<script>window.location="'.$tempLink.'"</script>';
                                 //echo $tempLink;
@@ -470,10 +433,11 @@ switch($_GET["size"]){
                                 exit();
                             }
             ?>
-            <a href="<? echo ($rootDir ?? "/assets/")."index.php" ?>?page=view&dir=<?echo removeLastOccurrence(str_replace(__DIR__, "", $file), basename($file));?>&name=<?echo basename($file);?>" class="group-item group-item-action"><span class="uppertext"><?echo basename($file);?></span> <span style="float:right;">[ <?echo removeLastOccurrence(str_replace(__DIR__, "", $file), basename($file));?> ] <div class="downloadIcon"></div></span></a>
+                    
+            <a href="<? echo ($rootDir ?? "/assets/") ?>?page=view&dir=<?echo removeLastOccurrence(str_replace(ROOT, "", $file), basename($file));?>&name=<?echo basename($file);?>" class="group-item group-item-action"><span class="uppertext"><?echo basename($file);?></span> <span style="float:right;">[ <?echo removeLastOccurrence(str_replace(ROOT, "", $file), basename($file));?> ] <div class="downloadIcon"></div></span></a>
             <?
-                        /* title="<?echo formatBytes(exec('du -bcS ' . str_replace(basename($file), "", str_replace(__DIR__, "", $file)).DIRECTORY_SEPARATOR .basename($file)))?>"*/
-                    }
+                        /* title="<?echo formatBytes(exec('du -bcS ' . str_replace(basename($file), "", str_replace(ROOT, "", $file)).DIRECTORY_SEPARATOR .basename($file)))?>"*/
+                    } // else { var_dump($file); }
                 }
             ?>
             <!--<a href="?page=signin" class="group-item group-item-action footer">Sign In</a>/-->
@@ -520,7 +484,7 @@ switch($_GET["size"]){
 }
 
 
-function glob_tree_search($path, $pattern, $_base_path = null) {
+/*function glob_tree_search($path, $pattern, $_base_path = null) {
     if (is_null($_base_path)) {
         $_base_path = '';
     } else {
@@ -529,15 +493,38 @@ function glob_tree_search($path, $pattern, $_base_path = null) {
 
     $out = array();
     foreach (glob($path . '/' . $pattern, GLOB_BRACE) as $file) {
+        if(strpos(basename($file), '.php') || strpos(basename($file), '.htm') || strpos(basename($file), "__hidden") !== false || strpos(basename($file), "NanoCDS") !== false) continue;
         $out[] = $_base_path . basename($file);
     }
 
     foreach (glob($path . '/*', GLOB_ONLYDIR) as $dir) {
+        if(strpos(basename($dir), '.php') || strpos(basename($dir), '.htm') || strpos(basename($dir), "__hidden") !== false || strpos(basename($dir), "NanoCDS") !== false) continue;
         $out[] = $_base_path . basename($dir); // Include directory names
         $out = array_merge($out, glob_tree_search($dir, $pattern, $_base_path));
     }
 
     return $out;
+}*/
+
+function glob_tree_search($path, $pattern, $_base_path = null)
+{
+	if (is_null($_base_path)) {
+		$_base_path = '';
+	} else {
+		$_base_path .= basename($path) . '/';
+	}
+
+	$out = array();
+	foreach(glob($path . '/' . $pattern, GLOB_BRACE) as $file) {
+        if(strpos(basename($file), '.php') || strpos(basename($file), '.htm') || strpos(basename($file), "__hidden") !== false || strpos(basename($file), "NanoCDS") !== false) continue;
+        $out[] = $_base_path . basename($file);
+	}
+
+	foreach(glob($path . '/*', GLOB_ONLYDIR) as $file) {
+		if(strpos(basename($file), '.php') || strpos(basename($file), '.htm') || strpos(basename($file), "__hidden") !== false || strpos(basename($file), "NanoCDS") !== false) continue;
+        $out = array_merge($out, glob_tree_search($file, $pattern, $_base_path));
+	}
+	return $out;
 }
 
 function getDirectoryPath($file) {
@@ -557,6 +544,38 @@ function getDirectoryPath($file) {
 
 function removeLastOccurrence($string, $substring) {
     return preg_replace("/$substring$/", '', $string);
+}
+
+function getDirContents($path) {
+    $rii = new RecursiveIteratorIterator(new RecursiveDirectoryIterator(realpath($path)));
+    $files = array(); 
+    foreach ($rii as $file)
+    //if(strpos($file, '__hidden') || strpos($file, '..')) continue;
+    
+        if ($file->isDir()){
+            if(strpos($file, "__hidden") !== false || strpos($file, "NanoCDS") !== false || strpos($file, "..") !== false) continue;
+            $files[] = $file; //->getPathname()
+        }
+            //var_dump($files);
+    return $files;
+}
+
+function countFilesAndDirs($directory) {
+    // Команда для подсчета файлов, исключая скрытые и указанные папки
+    $findFilesCommand = "find $directory -mindepth 1 -maxdepth 999 -type f -not -path '*NanoCNS*' -not -path '*__hidden*' -print | wc -l";
+
+    // Команда для подсчета директорий, исключая скрытые и указанные
+    $findDirsCommand = "find $directory -mindepth 1 -maxdepth 999 -type d -not -path '*NanoCNS*' -not -path '*__hidden*' -print | wc -l";
+
+    // Выполнение команд и получение результатов
+    exec($findFilesCommand, $outputFiles, $returnVar);
+    exec($findDirsCommand, $outputDirs, $returnVar);
+
+    // Возврат результатов
+    return [
+        'files' => intval($outputFiles[0]),
+        'dirs' => intval($outputDirs[0])
+    ];
 }
  
 ?> ?>

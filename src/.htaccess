@@ -24,13 +24,9 @@ ExpiresByType application/x-javascript "access 1 month"
 ExpiresDefault "access 2 days"
 </IfModule>
 
-# Убедимся, что запросы к реальным файлам и директориям не перенаправляются
+RewriteRule ^(.*)$ NanoCDS/index.php [L,QSA]
+
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 
-# Исключаем запросы, которые содержат "index.php" в URL, чтобы предотвратить циклические перенаправления
 RewriteCond %{REQUEST_URI} !/index\.php$
-
-# Перенаправляем только запросы без параметров на index.php
-RewriteRule ^(.*)$ index.php [L,QSA]
-
