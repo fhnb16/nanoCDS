@@ -1,37 +1,35 @@
 <?php
 
 function parse_friendly_url() {
-    // Если параметры уже переданы через $_GET, пропускаем разбор URL
     if (!empty($_GET)) {
         return;
     }
 
-    // Получаем путь после /assets/
     $request_uri = $_SERVER['REQUEST_URI'];
     $path = parse_url($request_uri, PHP_URL_PATH);
+    $url = $request_uri;
+    
     $path = str_replace('/assets/', '', $path);
 
-    // Разбиваем путь на части
+
     $segments = explode('/', trim($path, '/'));
 
-    // Проверяем первый сегмент, который должен быть page
     if (empty($segments[0])) {
         return;
     }
 
-    // Извлекаем значение page
     $page = array_shift($segments);
     $_GET['page'] = $page;
 
-    // Обрабатываем различные страницы
     switch ($page) {
         case 'view':
-            // Для 'view' формат: view/dir/v/version/f/file
-            if (count($segments) < 5) {
-                break;
-            }
-            $_GET['dir'] = $segments[0] . '/' . $segments[2];  // dir = "tailwind.css/2.0.2"
-            $_GET['name'] = $segments[4];  // name = "tailwind.min.css"
+    $pattern = '/^\/assets\/view\/(?<fullDir>[^\/]+(\/[^\/]+)*)(?:\/v\/(?<version>[^\/]+))?\/f\/(?<name>[^\/]+)$/';
+
+if (preg_match($pattern, $url, $matches)) {
+    $_GET['dir'] = str_replace('/v/', '/', $matches['fullDir']);
+    $_GET['name'] = $matches['name'];
+}
+
             break;
 
         case 'dir':

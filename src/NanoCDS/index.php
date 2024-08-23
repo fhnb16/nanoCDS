@@ -5,7 +5,7 @@ Author: Artur `fhnb16` Tkachenko
 */
 
 // Create folder with name `__hidden` to hide files from Nano CDS
-$Version = 1.7;
+$Version = 1.8;
 //$rootDir = ""; // root directory, `/assets/` or `/` or anything else..
 
 define('ROOT', __DIR__ . '/../');
@@ -148,6 +148,8 @@ about:
         view:
         if($_GET["page"] == "view"){
 
+            //var_dump($_GET);
+
 $attachment_location = "../".$_GET["dir"].DIRECTORY_SEPARATOR.$_GET["name"];
         if (file_exists($attachment_location)) {
 
@@ -165,7 +167,7 @@ $attachment_location = "../".$_GET["dir"].DIRECTORY_SEPARATOR.$_GET["name"];
                 break;
                 case "php":
 
-                    $PageTitle = ""; include_once('Messages.php');
+                    $PageTitle = "";
                     ?>
                     <div class="group">
             <span class="group-item group-item-action header">

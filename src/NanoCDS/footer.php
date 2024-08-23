@@ -15,8 +15,11 @@ $total_time = round(($finish - $start), 4);
         <p>Made with <span title="<?echo 'Page generated in '.$total_time.' seconds.';?>&#010;Nano CDS size is <?echo formatBytes(filesize('index.php')+filesize('footer.php')+filesize('header.php')+filesize('url_parser.php'),1);?>&#010;Version: <?echo $Version;?>">❤️</span> by <a href="//fhnb.ru" class="btnv1 smol" style="color:white;">fhnb16</a> <br /> 2020 - <? echo date("Y"); ?></p>
     </footer>
 <script type="text/javascript">
-document.title = document.title+'<?echo $SearchCount;?>';
-document.getElementById("searchCount").title = "<?echo $SearchCount;?>";
+    var SearchCount = '<?echo $SearchCount;?>';
+    if(SearchCount != ""){
+        document.title = document.title+SearchCount;
+        document.getElementById("searchCount").setAttribute('title', SearchCount);
+    }
 </script>
 <script type="text/javascript">
 function beautifyURL(url) {
@@ -33,7 +36,12 @@ function beautifyURL(url) {
         var name = params.get('name');
         var tempDir = params.get('dir').split('/');
         if (dir && name) {
-            newPath += `/${tempDir[0]}/v/${tempDir[1]}/f/${name}`;
+            var verCheck = isVersion(tempDir[1]);
+            if(verCheck){
+                newPath += `/${tempDir[0]}/v/${tempDir[1]}/f/${name}`;
+            } else {
+                newPath += `/${tempDir[0]}/${tempDir[1]}/f/${name}`;
+            }
         }
     } else if (page === 'latest') {
         var asset = params.get('asset');
@@ -53,13 +61,21 @@ function beautifyURL(url) {
     return urlObj.origin + newPath;
 }
 
+function isVersion(version) {
+    // Регулярное выражение для проверки формата версии
+    const versionRegex = /^(\d+(\.\d+)*)([a-zA-Z])?$/;
+
+    // Проверяем, соответствует ли строка регулярному выражению
+    return versionRegex.test(version);
+}
+
 function updateDownloadLinks() {
     document.querySelectorAll('.downloadIcon').forEach(icon => {
-        const parentLink = icon.closest('a');
+        var parentLink = icon.closest('a');
         if (parentLink) {
-            const newLink = document.createElement("a");
-            const originalHref = parentLink.getAttribute('href');
-            const newHref = beautifyURL('https://dev.fhnb.ru'+originalHref.replace("https", ""));
+            var newLink = document.createElement("a");
+            var originalHref = parentLink.getAttribute('href');
+            var newHref = beautifyURL('https://dev.fhnb.ru'+originalHref.replace("https", "")).replace("/undefined", "");
             newLink.setAttribute('href', newHref);
             newLink.setAttribute('class', 'btnv1 smol');
             newLink.innerText = "✨";
