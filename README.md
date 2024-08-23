@@ -1,5 +1,5 @@
 # nanoCDS
-## Mini Content Delivery System v1.51
+## Mini Content Delivery System v1.6
 
 > [Test live on my website](https://dev.fhnb.ru/assets/)
 

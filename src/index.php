@@ -5,7 +5,7 @@ Author: Artur `fhnb16` Tkachenko
 */
 
 // Create folder with name `__hidden` to hide files from Nano CDS
-$Version = 1.51;
+$Version = 1.6;
 //$rootDir = ""; // root directory, `/assets` or `/` or anything else..
 
 $time = microtime();
@@ -75,7 +75,7 @@ about:
 <div class="group">
     <span class="group-item group-item-action header">
         <a class="color-gray" href="<?echo $rootDir ?? "/assets/" ?>">Nano CDS</a> &middot; <span class="uppertext">About</span><a href="javascript:history.back()" class="btnv1" style="float:right;">
-            <- Go Back</a> </span> <p>CDS means Content Delivery System (Repository), this system was developed by <a href="//fhnb.ru" class="btnv1 me" style="color:white;">fhnb16</a> to simplify the delivery and storage of various CSS frameworks and JS libraries, software or other files which are necessary
+            <- Go Back</a> </span> <p>CDS means Content Delivery System (Repository), this system was developed by <a href="//fhnb.ru" class="btnv1 smol" style="color:white;">fhnb16</a> to simplify the delivery and storage of various CSS frameworks and JS libraries, software or other files which are necessary
                 in work.</p>
                 <p>All rights of the frameworks presented in Nano CDS belong to their owners.</p>
                 <p>If you want to support me, please visit <a href="//fhnb.ru/photos/?page=support" class="btnv1" style="color:white;">this page</a></p>
@@ -112,11 +112,11 @@ about:
                                {
                                 if(is_file($_GET["name"].DIRECTORY_SEPARATOR .$value)){
                                     ?>
-        <a href="<? echo ($rootDir ?? "/assets/")."index.php" ?>?page=view&dir=<?echo $_GET["name"];?>&name=<?echo $value;?>" class="group-item group-item-action"><?echo $value;?><span style="float:right;"><?echo formatBytes(exec('du -bcS ' . $_GET["name"].DIRECTORY_SEPARATOR .$value))?></span></a>
+        <a href="<? echo ($rootDir ?? "/assets/")."index.php" ?>?page=view&dir=<?echo $_GET["name"];?>&name=<?echo $value;?>" class="group-item group-item-action"><?echo $value;?><span style="float:right;"><?echo formatBytes(exec('du -bcS ' . $_GET["name"].DIRECTORY_SEPARATOR .$value))?><div class="downloadIcon"></div></span></a>
                 <?
                                 }else if(is_dir($_GET["name"].DIRECTORY_SEPARATOR .$value)){
                                     ?>
-        <a href="?page=dir&name=<?echo $_GET["name"].DIRECTORY_SEPARATOR .$value;?>" class="group-item group-item-action"><span class="uppertext"><?echo $value;?></span><span style="float:right;"><?echo formatBytes(exec('du -bcS ' . $_GET["name"].DIRECTORY_SEPARATOR .$value))?></span></a>
+        <a href="?page=dir&name=<?echo $_GET["name"].DIRECTORY_SEPARATOR .$value;?>" class="group-item group-item-action"><span class="uppertext"><?echo $value;?></span><span style="float:right;"><?echo formatBytes(exec('du -bcS ' . $_GET["name"].DIRECTORY_SEPARATOR .$value))?><div class="downloadIcon"></div></span></a>
                 <?
                                 }
                                }
@@ -362,11 +362,11 @@ $count3 = count(getDirContents(__DIR__));
                         
                             //echo $file."<br/>";
             ?>
-            <a href="<? echo ($rootDir ?? "/assets/")."index.php" ?>?page=view&dir=<?echo str_replace(basename($file), "", str_replace(__DIR__, "", $file));?>&name=<?echo basename($file);?>" class="group-item group-item-action"><span class="uppertext"><?echo basename($file);?></span> <span style="float:right;">[ <?echo str_replace(basename($file), "", str_replace(__DIR__, "", $file));?> ]</span></a>
+            <a href="<? echo ($rootDir ?? "/assets/")."index.php" ?>?page=view&dir=<?echo removeLastOccurrence(str_replace(__DIR__, "", $file), basename($file));?>&name=<?echo basename($file);?>" class="group-item group-item-action"><span class="uppertext"><?echo basename($file);?></span> <span style="float:right;">[ <?echo removeLastOccurrence(str_replace(__DIR__, "", $file), basename($file));?> ] <div class="downloadIcon"></div></span></a>
             <?
                                     /* title="<?echo formatBytes(exec('du -bcS ' . str_replace(basename($file), "", str_replace(__DIR__, "", $file)).DIRECTORY_SEPARATOR .basename($file)))?>"*/
                     }
-                }
+        }
             ?>
             <!--<a href="?page=signin" class="group-item group-item-action footer">Sign In</a>/-->
         </div>
@@ -454,7 +454,7 @@ switch($_GET["size"]){
                                 $fullUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://" . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
                                 $fullUrl = str_replace("auto=-1", "auto=1", $fullUrl);
                                 $fullUrl = str_replace("/a/-1", "/a/1", $fullUrl);
-                                echo '<center><a id="latestLink" href="'.$fullUrl.'">'.$fullUrl.'</a></center>';
+                                echo '<a class="link btn btn-default" id="latestLink" href="'.$fullUrl.'">'.$fullUrl.'</a>';
                                 include_once('footer.php');
                                 exit();
                             }
@@ -469,7 +469,7 @@ switch($_GET["size"]){
                                 exit();
                             }
             ?>
-            <a href="<? echo ($rootDir ?? "/assets/")."index.php" ?>?page=view&dir=<?echo str_replace(basename($file), "", str_replace(__DIR__, "", $file));?>&name=<?echo basename($file);?>" class="group-item group-item-action"><span class="uppertext"><?echo basename($file);?></span> <span style="float:right;">[ <?echo str_replace(basename($file), "", str_replace(__DIR__, "", $file));?> ]</span></a>
+            <a href="<? echo ($rootDir ?? "/assets/")."index.php" ?>?page=view&dir=<?echo removeLastOccurrence(str_replace(__DIR__, "", $file), basename($file));?>&name=<?echo basename($file);?>" class="group-item group-item-action"><span class="uppertext"><?echo basename($file);?></span> <span style="float:right;">[ <?echo removeLastOccurrence(str_replace(__DIR__, "", $file), basename($file));?> ] <div class="downloadIcon"></div></span></a>
             <?
                         /* title="<?echo formatBytes(exec('du -bcS ' . str_replace(basename($file), "", str_replace(__DIR__, "", $file)).DIRECTORY_SEPARATOR .basename($file)))?>"*/
                     }
@@ -491,7 +491,8 @@ switch($_GET["size"]){
 
 
 
-            goto main;
+            header("Location: https://fhnb.ru/photos/?page=support", true, 301);
+            exit();
 
 
             
@@ -518,23 +519,24 @@ switch($_GET["size"]){
 }
 
 
-function glob_tree_search($path, $pattern, $_base_path = null)
-{
-	if (is_null($_base_path)) {
-		$_base_path = '';
-	} else {
-		$_base_path .= basename($path) . '/';
-	}
- 
-	$out = array();
-	foreach(glob($path . '/' . $pattern, GLOB_BRACE) as $file) {
-		$out[] = $_base_path . basename($file);
-	}
-	
-	foreach(glob($path . '/*', GLOB_ONLYDIR) as $file) {
-		$out = array_merge($out, glob_tree_search($file, $pattern, $_base_path));
-	}
-	return $out;
+function glob_tree_search($path, $pattern, $_base_path = null) {
+    if (is_null($_base_path)) {
+        $_base_path = '';
+    } else {
+        $_base_path .= basename($path) . '/';
+    }
+
+    $out = array();
+    foreach (glob($path . '/' . $pattern, GLOB_BRACE) as $file) {
+        $out[] = $_base_path . basename($file);
+    }
+
+    foreach (glob($path . '/*', GLOB_ONLYDIR) as $dir) {
+        $out[] = $_base_path . basename($dir); // Include directory names
+        $out = array_merge($out, glob_tree_search($dir, $pattern, $_base_path));
+    }
+
+    return $out;
 }
 
 function getDirectoryPath($file) {
@@ -550,6 +552,10 @@ function getDirectoryPath($file) {
     $replacement = '$1$2';
     
     return preg_replace($pattern, $replacement, $url);
+}
+
+function removeLastOccurrence($string, $substring) {
+    return preg_replace("/$substring$/", '', $string);
 }
  
 ?> ?>
