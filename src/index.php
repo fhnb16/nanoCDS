@@ -82,7 +82,7 @@ about:
                 <p>Write me - <a class="btnv1" style="color:white;" href="mailto:artur@fhnb.ru">artur@fhnb.ru</a></p>
                 <p>Made by <a href="//fhnb.ru" class="btnv1" style="color:white;">fhnb16</a> in 2020</p>
                 <p>Nano CDS size is <?echo formatBytes(filesize('index.php')+filesize('footer.php')+filesize('header.php'),1);?> (3 files)</p>
-                <p>Version: <?echo $Version;?></p>
+                <p>Version: <?echo $Version;?>, <? echo date("F d Y H:i:s.", filemtime(__FILE__))?></p>
 </div>
 <?
             include_once('footer.php');
