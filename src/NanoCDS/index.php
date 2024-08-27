@@ -335,7 +335,10 @@ $attachment_location = "../".$_GET["dir"].DIRECTORY_SEPARATOR.$_GET["name"];
                         
                             //echo $file."<br/>";
             ?>
-            <a href="<? echo ($rootDir ?? "/assets/") ?>?page=view&dir=<?echo removeLastOccurrence(str_replace(ROOT, "", $file), basename($file));?>&name=<?echo basename($file);?>" class="group-item group-item-action"><span class="uppertext"><?echo basename($file);?></span> <span style="float:right;">[ <?echo removeLastOccurrence(str_replace(ROOT, "", $file), basename($file));?> ] <div class="downloadIcon"></div></span></a>
+            <?
+                $filePath = rtrim(removeLastOccurrence(str_replace(ROOT, "", $file), basename($file)), '/');
+            ?>
+            <a href="<? echo ($rootDir ?? "/assets/") ?>?page=view&dir=<?echo $filePath;?>&name=<?echo basename($file);?>" class="group-item group-item-action"><span class="uppertext"><?echo basename($file);?></span> <span style="float:right;">[ <?echo $filePath;?> ] <div class="downloadIcon"></div></span></a>
             <?
                                     /* title="<?echo formatBytes(exec('du -bcS ' . str_replace(basename($file), "", str_replace(ROOT, "", $file)).DIRECTORY_SEPARATOR .basename($file)))?>"*/
                     }
@@ -435,8 +438,11 @@ switch($_GET["size"]){
                                 exit();
                             }
             ?>
-                    
-            <a href="<? echo ($rootDir ?? "/assets/") ?>?page=view&dir=<?echo removeLastOccurrence(str_replace(ROOT, "", $file), basename($file));?>&name=<?echo basename($file);?>" class="group-item group-item-action"><span class="uppertext"><?echo basename($file);?></span> <span style="float:right;">[ <?echo removeLastOccurrence(str_replace(ROOT, "", $file), basename($file));?> ] <div class="downloadIcon"></div></span></a>
+
+            <?
+                $filePath = rtrim(removeLastOccurrence(str_replace(ROOT, "", $file), basename($file)), '/');
+            ?>
+            <a href="<? echo ($rootDir ?? "/assets/") ?>?page=view&dir=<?echo $filePath;?>&name=<?echo basename($file);?>" class="group-item group-item-action"><span class="uppertext"><?echo basename($file);?></span> <span style="float:right;">[ <?echo $filePath;?> ] <div class="downloadIcon"></div></span></a>
             <?
                         /* title="<?echo formatBytes(exec('du -bcS ' . str_replace(basename($file), "", str_replace(ROOT, "", $file)).DIRECTORY_SEPARATOR .basename($file)))?>"*/
                     } // else { var_dump($file); }
@@ -535,9 +541,9 @@ function getDirectoryPath($file) {
     array_pop($parts);
 
     return implode('/', $parts);
-  }
+}
 
-  function clean_url($url) {
+function clean_url($url) {
     $pattern = '#(/assets/).*?(/index\.php)#';
     $replacement = '$1$2';
     

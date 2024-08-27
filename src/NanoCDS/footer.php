@@ -34,15 +34,16 @@ function beautifyURL(url) {
     if (page === 'view') {
         var dir = params.get('dir');
         var name = params.get('name');
-        var tempDir = params.get('dir').split('/');
+        newPath += `/${dir}/f/${name}`;
+        /*var tempDir = params.get('dir').split('/');
         if (dir && name) {
             var verCheck = isVersion(tempDir[1]);
             if(verCheck){
-                newPath += `/${tempDir[0]}/v/${tempDir[1]}/f/${name}`;
+                newPath += `/${tempDir[0]}/${tempDir[1]}/f/${name}`;
             } else {
                 newPath += `/${tempDir[0]}/${tempDir[1]}/f/${name}`;
             }
-        }
+        }*/
     } else if (page === 'latest') {
         var asset = params.get('asset');
         var type = params.get('type') || 'any';
