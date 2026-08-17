@@ -33,7 +33,7 @@ nano_header('Directory: ' . $relative);
 <div class="group">
 <?php
 nano_crumb(nano_path_crumb($relative), true,
-    '<a class="btnv1" href="' . e(nano_url(['page' => 'api', 'q' => nano_path_asset($relative)])) . '">api</a> '
+    '<a class="btnv1" href="' . e(nano_url(['page' => 'api', 'q' => nano_path_asset($relative)])) . '">api</a>'
 );
 
 if ($entries === []) {

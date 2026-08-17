@@ -47,8 +47,10 @@ function nano_crumb(string $crumb = '', bool $back = true, string $right = ''): 
     if ($back) {
         $right .= '<a href="javascript:history.back()" class="btnv1">&lt;- Go Back</a>';
     }
+    // .nano-crumb-actions is a flex row: it spaces the buttons itself, because
+    // plain whitespace between them is discarded inside a flex container.
     if ($right !== '') {
-        echo '<span style="float:right;">' . $right . '</span>';
+        echo '<span class="nano-crumb-actions" style="float:right;">' . $right . '</span>';
     }
 
     echo '</span>' . PHP_EOL;
