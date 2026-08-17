@@ -3,22 +3,29 @@
 Author: Artur `fhnb16` Tkachenko
 2020
 */
-$time = microtime();
-$time = explode(' ', $time);
-$time = $time[1] + $time[0];
-$finish = $time;
-$total_time = round(($finish - $start), 4);
+$finish = microtime(true);
+$total_time = round(($finish - ($start ?? $finish)), 4);
+
+$nanoDir = defined('NANO_DIR') ? NANO_DIR : __DIR__;
+$nanoSelfSize = 0;
+foreach (array('index.php', 'footer.php', 'header.php', 'url_parser.php') as $nanoFile) {
+    $nanoSelfSize += is_file($nanoDir . '/' . $nanoFile) ? filesize($nanoDir . '/' . $nanoFile) : 0;
+}
+$SearchCount = $SearchCount ?? '';
 ?>
 </div>
     <footer>
-        <p><a href="?page=about" style="color:white;" class="btnv1">About</a> <a href="<?echo $rootDir ?? "/assets/" ?>?page=support" style="color:white;" class="btnv1">Support</a> <a href="?page=tools" style="color:white;" class="btnv1">Tools</a></p>
-        <p>Made with <span title="<?echo 'Page generated in '.$total_time.' seconds.';?>&#010;Nano CDS size is <?echo formatBytes(filesize('index.php')+filesize('footer.php')+filesize('header.php')+filesize('url_parser.php'),1);?>&#010;Version: <?echo $Version;?>">❤️</span> by <a href="//fhnb.ru" class="btnv1 smol" style="color:white;">fhnb16</a> <br /> 2020 - <? echo date("Y"); ?></p>
+        <p><a href="?page=about" style="color:white;" class="btnv1">About</a> <a href="<?= htmlspecialchars((string) ($rootDir ?? "/assets/"), ENT_QUOTES) ?>?page=support" style="color:white;" class="btnv1">Support</a> <a href="?page=tools" style="color:white;" class="btnv1">Tools</a></p>
+        <p>Made with <span title="<?= 'Page generated in ' . $total_time . ' seconds.'; ?>&#010;Nano CDS size is <?= function_exists('formatBytes') ? formatBytes($nanoSelfSize, 1) : $nanoSelfSize; ?>&#010;Version: <?= htmlspecialchars((string) ($Version ?? ''), ENT_QUOTES); ?>">❤️</span> by <a href="//fhnb.ru" class="btnv1 smol" style="color:white;">fhnb16</a> <br /> 2020 - <?= date("Y"); ?></p>
     </footer>
 <script type="text/javascript">
-    var SearchCount = '<?echo $SearchCount;?>';
+    var SearchCount = <?= json_encode((string) $SearchCount, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP); ?>;
     if(SearchCount != ""){
         document.title = document.title+SearchCount;
-        document.getElementById("searchCount").setAttribute('title', SearchCount);
+        var searchCountEl = document.getElementById("searchCount");
+        if (searchCountEl) {
+            searchCountEl.setAttribute('title', SearchCount);
+        }
     }
 </script>
 <script type="text/javascript">
@@ -27,7 +34,7 @@ function beautifyURL(url) {
     var params = new URLSearchParams(urlObj.search);
     var page = params.get('page');
 
-    let newPath = `<?echo $rootDir ?? "/assets/" ?>${page}`;
+    let newPath = `<?= htmlspecialchars((string) ($rootDir ?? "/assets/"), ENT_QUOTES) ?>${page}`;
     
     params.delete('page');
     
@@ -90,4 +97,4 @@ document.addEventListener('DOMContentLoaded', updateDownloadLinks);
 
 </script>
 </body>
-</html>
+</html>

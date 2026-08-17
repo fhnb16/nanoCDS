@@ -5,10 +5,13 @@ function parse_friendly_url() {
         return;
     }
 
-    $request_uri = $_SERVER['REQUEST_URI'];
-    $path = parse_url($request_uri, PHP_URL_PATH);
+    $request_uri = $_SERVER['REQUEST_URI'] ?? '';
+    if ($request_uri === '') {
+        return;
+    }
+    $path = (string) parse_url($request_uri, PHP_URL_PATH);
     $url = $request_uri;
-    
+
     $path = str_replace('/assets/', '', $path);
 
 
@@ -38,7 +41,7 @@ if (preg_match($pattern, $url, $matches)) {
             break;
 
         case 'latest':
-            $_GET['asset'] = array_shift($segments);
+            $_GET['asset'] = array_shift($segments) ?? '';
 
             // Возможные дополнительные параметры t, s, a
             while (!empty($segments)) {
@@ -59,7 +62,7 @@ if (preg_match($pattern, $url, $matches)) {
             break;
 
         case 'search':
-            $_GET['query'] = array_shift($segments);
+            $_GET['query'] = array_shift($segments) ?? '';
             break;
 
         // Обработка других страниц
@@ -70,4 +73,4 @@ if (preg_match($pattern, $url, $matches)) {
 }
 
 // Подключаем функцию
-parse_friendly_url();
+parse_friendly_url();

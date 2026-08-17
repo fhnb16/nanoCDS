@@ -1,17 +1,19 @@
-<?
+<?php
 /*
 Author: Artur `fhnb16` Tkachenko
 2020
 */
-header('Content-Type: text/html; charset=utf-8');
+if (!headers_sent()) {
+    header('Content-Type: text/html; charset=utf-8');
+}
 
 ?>
 <html>
 <head>
-    <?
-    if(isset($PageTitle) && $PageTitle != "" && !empty($PageTitle) && $PageTitle != null){
-        echo '<title>Nano CDS - '.$PageTitle.'</title>';
-    }else{
+    <?php
+    if (isset($PageTitle) && $PageTitle != "" && !empty($PageTitle) && $PageTitle != null) {
+        echo '<title>Nano CDS - ' . htmlspecialchars((string) $PageTitle, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '</title>';
+    } else {
         echo '<title>Nano CDS</title>';
     }
     ?>
@@ -28,4 +30,4 @@ header('Content-Type: text/html; charset=utf-8');
 </head>
 
 <body>
-    <div class="container">
+    <div class="container">
