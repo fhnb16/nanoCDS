@@ -1,32 +1,86 @@
+# Nano CDS - Apache configuration
+#
+# Every request under this folder is handled by NanoCDS/index.php. Files are
+# never served directly by Apache, which is what keeps the repository's own
+# .php sources, dotfiles and __hidden folders unreachable.
+
 RewriteEngine On
 
-Header add Access-Control-Allow-Origin "*"
-Header add Access-Control-Allow-Headers "origin, x-requested-with, content-type"
-Header add Access-Control-Allow-Methods "PUT, GET, POST, DELETE, OPTIONS"
+# ---------------------------------------------------------------------------
+# MIME types and caching
+# ---------------------------------------------------------------------------
+<IfModule mod_mime.c>
+AddType application/vnd.ms-fontobject .eot
+AddType application/x-font-ttf         .ttf
+AddType font/otf                       .otf
+AddType font/woff                      .woff
+AddType font/woff2                     .woff2
+AddType image/svg+xml                  .svg
+AddType image/webp                     .webp
+AddType image/avif                     .avif
+AddType application/wasm               .wasm
+</IfModule>
 
 <IfModule mod_expires.c>
 ExpiresActive On
-AddType application/vnd.ms-fontobject .eot 
-AddType application/x-font-ttf .ttf
-AddType application/x-font-opentype .otf
-AddType application/x-font-woff .woff
-AddType image/svg+xml .svg
 ExpiresByType application/vnd.ms-fontobject "access 1 year"
-ExpiresByType application/x-font-ttf "access 1 year"
-ExpiresByType application/x-font-opentype "access 1 year"
-ExpiresByType application/x-font-woff "access 1 year"
-ExpiresByType image/svg+xml "access 1 year"
-ExpiresByType text/html "access 1 hour"
-ExpiresByType text/css "access 14 days"
-ExpiresByType text/x-javascript "access 3 weeks"
-ExpiresByType application/javascript "access 1 month"  
-ExpiresByType application/x-javascript "access 1 month"
-ExpiresDefault "access 2 days"
+ExpiresByType application/x-font-ttf        "access 1 year"
+ExpiresByType font/otf                      "access 1 year"
+ExpiresByType font/woff                     "access 1 year"
+ExpiresByType font/woff2                    "access 1 year"
+ExpiresByType image/svg+xml                 "access 1 year"
+ExpiresByType image/webp                    "access 1 year"
+ExpiresByType image/avif                    "access 1 year"
+ExpiresByType text/html                     "access 1 hour"
+ExpiresByType text/css                      "access 14 days"
+ExpiresByType text/x-javascript             "access 3 weeks"
+ExpiresByType application/javascript        "access 1 month"
+ExpiresByType application/x-javascript      "access 1 month"
+ExpiresDefault                              "access 2 days"
 </IfModule>
 
+# ---------------------------------------------------------------------------
+# Cross-origin access
+#
+# CORS headers are NOT set here any more. Nano CDS emits them from PHP on the
+# responses that actually need them - the raw asset endpoint (?page=view and
+# its /view/... alias) and the JSON API - so libraries stay usable from any
+# other site, while the browser UI pages no longer advertise a wildcard.
+# Uncomment the block below only if you want Apache to add them to everything.
+# ---------------------------------------------------------------------------
+#<IfModule mod_headers.c>
+#Header set Access-Control-Allow-Origin "*"
+#Header set Access-Control-Allow-Methods "GET, HEAD, OPTIONS"
+#</IfModule>
+
+# ---------------------------------------------------------------------------
+# Defence in depth
+#
+# The front controller already refuses to serve these, and the catch-all rule
+# below means Apache never reaches them. The rules stay as a safety net in
+# case someone reorders the rewrite later.
+# ---------------------------------------------------------------------------
+<IfModule mod_authz_core.c>
+    <FilesMatch "\.(php[0-9s]?|phtml|phar|ini|env|sh|bat|cgi|pl|py)$">
+        Require all denied
+    </FilesMatch>
+    <Files "index.php">
+        Require all granted
+    </Files>
+</IfModule>
+
+RedirectMatch 404 (?i)/__hidden(/|$)
+
+Options -Indexes
+
+<IfModule mod_headers.c>
+Header always set X-Content-Type-Options "nosniff"
+</IfModule>
+
+# ---------------------------------------------------------------------------
+# Front controller
+#
+# Keep this LAST and keep it unconditional: it is what routes both the classic
+# ?page=... URLs and the pretty /view/... URLs into Nano CDS.
+# ---------------------------------------------------------------------------
 RewriteRule ^(.*)$ NanoCDS/index.php [L,QSA]
-
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
-
-RewriteCond %{REQUEST_URI} !/index\.php$

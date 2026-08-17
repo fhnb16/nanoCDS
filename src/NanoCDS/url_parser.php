@@ -1,76 +1,18 @@
 <?php
+/**
+ * Nano CDS - pretty URL parsing (compatibility wrapper).
+ *
+ * The implementation moved to router.php in 2.0. This file is kept because
+ * older installations include it directly; it simply forwards to the router.
+ */
+declare(strict_types=1);
 
-function parse_friendly_url() {
-    if (!empty($_GET)) {
-        return;
-    }
+defined('NANO_BOOT') or exit('Direct access is not allowed.');
 
-    $request_uri = $_SERVER['REQUEST_URI'] ?? '';
-    if ($request_uri === '') {
-        return;
-    }
-    $path = (string) parse_url($request_uri, PHP_URL_PATH);
-    $url = $request_uri;
-
-    $path = str_replace('/assets/', '', $path);
-
-
-    $segments = explode('/', trim($path, '/'));
-
-    if (empty($segments[0])) {
-        return;
-    }
-
-    $page = array_shift($segments);
-    $_GET['page'] = $page;
-
-    switch ($page) {
-        case 'view':
-    $pattern = '/^\/assets\/view\/(?<fullDir>[^\/]+(\/[^\/]+)*)(?:\/v\/(?<version>[^\/]+))?\/f\/(?<name>[^\/]+)$/';
-
-if (preg_match($pattern, $url, $matches)) {
-    $_GET['dir'] = str_replace('/v/', '/', $matches['fullDir']);
-    $_GET['name'] = $matches['name'];
-}
-
-            break;
-
-        case 'dir':
-            // Формат для 'dir': dir/folder/subfolder
-            $_GET['name'] = implode('/', $segments);
-            break;
-
-        case 'latest':
-            $_GET['asset'] = array_shift($segments) ?? '';
-
-            // Возможные дополнительные параметры t, s, a
-            while (!empty($segments)) {
-                $key = array_shift($segments);
-                $value = array_shift($segments);
-                switch ($key) {
-                    case 't':
-                        $_GET['type'] = $value ?? 'any';
-                        break;
-                    case 's':
-                        $_GET['size'] = $value ?? '0';
-                        break;
-                    case 'a':
-                        $_GET['auto'] = $value ?? '1';
-                        break;
-                }
-            }
-            break;
-
-        case 'search':
-            $_GET['query'] = array_shift($segments) ?? '';
-            break;
-
-        // Обработка других страниц
-        default:
-            $_GET = [];
-            break;
+if (!function_exists('parse_friendly_url')) {
+    /** @deprecated Use nano_parse_pretty_url(). */
+    function parse_friendly_url(): void
+    {
+        nano_parse_pretty_url();
     }
 }
-
-// Подключаем функцию
-parse_friendly_url();
