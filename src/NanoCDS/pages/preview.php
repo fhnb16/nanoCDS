@@ -36,7 +36,8 @@ nano_header('Preview: ' . $base);
 ?>
 <div class="group">
 <?php
-nano_crumb(nano_path_crumb($dirPart) . ' &bull; <span class="uppertext">' . e($base) . '</span>');
+// File names keep their original case - for a file name case is significant.
+nano_crumb(nano_path_crumb($dirPart) . ' &bull; <span class="nano-nocase">' . e($base) . '</span>');
 ?>
     <p class="nano-meta">
         <b>Size:</b> <?= e(nano_format_bytes($size)) ?> &nbsp;

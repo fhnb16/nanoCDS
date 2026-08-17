@@ -99,7 +99,8 @@ foreach ($files as $index => $file) {
         [
             ['href' => nano_pretty_url('preview', ['dir' => $dirPart, 'name' => $base]), 'title' => 'Preview and links', 'label' => 'preview'],
             ['href' => nano_pretty_url('view', ['dir' => $dirPart, 'name' => $base]), 'title' => 'Short link', 'label' => 'link'],
-        ]
+        ],
+        false
     );
 }
 ?>

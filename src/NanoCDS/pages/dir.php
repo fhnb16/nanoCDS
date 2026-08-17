@@ -45,7 +45,7 @@ foreach ($entries as $entry) {
         nano_row(
             nano_pretty_url('dir', ['name' => $entry['rel']]),
             $entry['name'],
-            nano_format_bytes($entry['size'])
+            $entry['size'] < 0 ? '' : nano_format_bytes($entry['size'])
         );
         continue;
     }

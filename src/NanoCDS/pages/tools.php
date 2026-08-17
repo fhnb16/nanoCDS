@@ -7,8 +7,9 @@ declare(strict_types=1);
 defined('NANO_BOOT') or exit('Direct access is not allowed.');
 
 $projects = nano_projects();
-$counter  = nano_count(nano_root());
-$total    = nano_size(nano_root());
+
+/* One walk of the tree gives the count and the size together. */
+$stats = nano_scan(nano_root());
 
 $types = [
     'any' => 'ANY', 'css' => 'CSS', 'js' => 'JS', 'json' => 'JSON', 'xml' => 'XML',
@@ -21,8 +22,8 @@ nano_header('Tools');
 ?>
 <div class="group">
 <?php nano_crumb('<span class="uppertext">Tools</span>'); ?>
-  <p>Projects in repository: <?= e((string) count($projects)) ?> and size is <?= e(nano_format_bytes($total)) ?>.</p>
-  <p>Total Files in repository: <?= e((string) $counter['files']) ?> in <?= e((string) $counter['dirs']) ?> folders.</p>
+  <p>Projects in repository: <?= e((string) count($projects)) ?> and size is <?= e(nano_format_bytes($stats['size'])) ?>.</p>
+  <p>Total Files in repository: <?= e((string) $stats['files']) ?> in <?= e((string) $stats['dirs']) ?> folders.</p>
 
   <p>Find latest library or framework version:</p>
   <form action="<?= e(nano_base()) ?>" method="GET" class="form-inline">

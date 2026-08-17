@@ -72,31 +72,34 @@ function nano_path_crumb(string $relative): string
 /**
  * A single row of a listing.
  *
- * `$actions` renders the small icon buttons on the right: the pretty link and,
- * for files, a link to the preview page. Generated in PHP - no JavaScript.
+ * The row is one flex line: name on the left, size / path in the middle, the
+ * small action buttons on the right. The name link is stretched over the whole
+ * row (`.nano-row-main::after`), so clicking anywhere outside the buttons opens
+ * the file - while the buttons stay separately clickable. All generated in PHP.
+ *
+ * @param array<int, array{href:string, title:string, label:string}>|null $actions
  */
 function nano_row(string $href, string $label, string $meta = '', ?array $actions = null, bool $upper = true): void
 {
-    echo '<a href="' . e($href) . '" class="group-item group-item-action">';
-    echo $upper ? '<span class="uppertext">' . e($label) . '</span>' : e($label);
-    echo '<span style="float:right;">';
+    echo '<div class="group-item group-item-action nano-row">';
+
+    echo '<a class="nano-row-main' . ($upper ? ' uppertext' : '') . '"'
+        . ' href="' . e($href) . '" title="' . e($label) . '">' . e($label) . '</a>';
 
     if ($meta !== '') {
-        echo e($meta) . ' ';
+        echo '<span class="nano-row-meta">' . e($meta) . '</span>';
     }
-    echo '<span class="downloadIcon"></span>';
-    echo '</span></a>';
 
     if ($actions !== null && $actions !== []) {
         echo '<span class="row-actions">';
         foreach ($actions as $action) {
             echo '<a class="btnv1 smol" href="' . e($action['href']) . '" title="' . e($action['title']) . '">'
-                . e($action['label']) . '</a> ';
+                . e($action['label']) . '</a>';
         }
         echo '</span>';
     }
 
-    echo PHP_EOL;
+    echo '</div>' . PHP_EOL;
 }
 
 /** Read-only field with the URL plus a copy button (the only JavaScript in the UI). */

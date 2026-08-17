@@ -302,6 +302,7 @@ Everything tunable lives in `NanoCDS/config.php`, which returns a plain array.
 | `blocked_ext` | php, phtml, phar, ini, env, sh, … | Never sent to a client |
 | `listing_hidden_ext` | php, phtml, htm, html | Hidden from listings and search |
 | `max_results` | `2000` | Hard cap on search / API result sets |
+| `dir_size` | `true` | Show total size of sub-folders in listings. Set to `false` on very large repositories — computing it walks each sub-tree |
 | `preview_bytes` | `262144` | How much of a text file the preview renders |
 | `preview_text_ext` | css, js, json, xml, … | Rendered as text |
 | `preview_image_ext` | png, jpg, svg, … | Rendered as an image |
@@ -441,6 +442,7 @@ the same file. The bytes and headers of `?page=view` responses are identical.
 | CORS on HTML pages | wildcard | none (assets and API keep it) |
 | Pretty links in listings | built in JS, hardcoded to `dev.fhnb.ru` | built in PHP, correct host |
 | `.htaccess`, `.git`, dotfiles | readable through `dir=.` | blocked |
+| Listing order | one alphabetical pile, descending | folders first (newest version on top), then files in natural order |
 | Public prefix | hardcoded `/assets/` | autodetected, configurable |
 | Short open tags `<?` | required `short_open_tag=On` | standard `<?php` / `<?=` |
 

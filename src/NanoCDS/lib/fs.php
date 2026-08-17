@@ -54,10 +54,14 @@ function nano_size(string|false|null $path): int
     return $total;
 }
 
-/** Number of files and directories below $directory. */
-function nano_count(string $directory): array
+/**
+ * Files, directories and total size below $directory - in a single walk.
+ *
+ * @return array{files:int, dirs:int, size:int}
+ */
+function nano_scan(string $directory): array
 {
-    $result = ['files' => 0, 'dirs' => 0];
+    $result = ['files' => 0, 'dirs' => 0, 'size' => 0];
     $real = realpath($directory);
     if ($real === false) {
         return $result;
@@ -69,6 +73,7 @@ function nano_count(string $directory): array
                 $result['dirs']++;
             } elseif ($item->isFile()) {
                 $result['files']++;
+                $result['size'] += $item->getSize();
             }
         }
     } catch (Throwable) {
@@ -78,6 +83,12 @@ function nano_count(string $directory): array
     return $result;
 }
 
+/** Number of files and directories below $directory. */
+function nano_count(string $directory): array
+{
+    return nano_scan($directory);
+}
+
 /**
  * One directory level, already filtered and safe to render.
  *
@@ -85,7 +96,7 @@ function nano_count(string $directory): array
  */
 function nano_list_dir(string $absolute, string $relative): array
 {
-    $entries = @scandir($absolute, SCANDIR_SORT_DESCENDING);
+    $entries = @scandir($absolute, SCANDIR_SORT_NONE);
     if ($entries === false) {
         return [];
     }
@@ -104,14 +115,42 @@ function nano_list_dir(string $absolute, string $relative): array
             continue;
         }
 
+        // Sub-folder sizes require walking the whole sub-tree; on a large
+        // repository that dominates the page, so it can be switched off.
+        $size = ($isDir && !nano_config('dir_size', true)) ? -1 : nano_size($child);
+
         $out[] = [
             'name'  => $entry,
             'rel'   => $relative === '' ? $entry : $relative . '/' . $entry,
             'dir'   => $isDir,
-            'size'  => nano_size($child),
+            'size'  => $size,
             'mtime' => (int) @filemtime($child),
         ];
     }
+
+    /*
+     * Folders first, newest version on top (5.10.0 above 5.9.9), then files in
+     * natural order. scandir()'s plain descending sort put files and folders in
+     * one alphabetical pile and got two-digit versions wrong.
+     */
+    usort($out, static function (array $a, array $b): int {
+        if ($a['dir'] !== $b['dir']) {
+            return $a['dir'] ? -1 : 1;
+        }
+        if ($a['dir']) {
+            $cmp = nano_version_cmp(
+                nano_is_version($b['name']) ? $b['name'] : null,
+                nano_is_version($a['name']) ? $a['name'] : null
+            );
+            if ($cmp !== 0) {
+                return $cmp;
+            }
+
+            return strnatcasecmp($b['name'], $a['name']);
+        }
+
+        return strnatcasecmp($a['name'], $b['name']);
+    });
 
     return $out;
 }

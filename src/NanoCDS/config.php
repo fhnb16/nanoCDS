@@ -47,6 +47,15 @@ return [
     /* Hard cap on search / API result sets, protects against huge scans. */
     'max_results' => 2000,
 
+    /*
+     * Show the total size of sub-folders in a directory listing.
+     *
+     * Computing it means walking each sub-tree, so on a very large repository
+     * this is the slowest thing on the page. Set it to false to show sizes for
+     * files only - listings then cost a single readdir().
+     */
+    'dir_size' => true,
+
     /* How many bytes of a text file the preview page renders. */
     'preview_bytes' => 262144,
 
